@@ -25,9 +25,20 @@ public class MainViewController implements Initializable {
 	
 	@FXML
 	public void onMenuItemVendedorAction() {
-		alertas.showAlert("Menu Item Vendedor", null, "OI",Alert.AlertType.INFORMATION);
+		alertas.showAlert("Menu Item Vendedor", null, "Meus Primeiros passos Java FX",Alert.AlertType.INFORMATION);
 	}
 
+	@FXML
+	public void onMenuItemDepartamentoAction() {
+		alertas.showAlert("Menu Item Departamento", null, "OI",Alert.AlertType.INFORMATION);
+	}
+	
+	@FXML
+	public void onMenuItemAbautAction() {
+		alertas.showAlert("Menu Item About", null, "OI",Alert.AlertType.INFORMATION);
+	}
+
+	
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
 		// TODO Auto-generated method stub
