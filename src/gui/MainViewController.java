@@ -37,7 +37,7 @@ public class MainViewController implements Initializable {
 
 	@FXML
 	public void onMenuItemDepartamentoAction() {
-		alertas.showAlert("Menu Item Departamento", null, "OI",Alert.AlertType.INFORMATION);
+		loadView("/gui/DepartmentView.fxml");
 	}
 	
 	@FXML
