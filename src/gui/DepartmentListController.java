@@ -93,6 +93,8 @@ public class DepartmentListController implements Initializable, DataChangeListen
 		List<Department> list = service.findAll();
 		obsList = FXCollections.observableArrayList(list);
 		tableViewDepartment.setItems(obsList);
+		initEditButtons();
+		initRemoveButtons();
 	}
 
 	private void createDialogForm(Department obj, String absoluteName, Stage parenteStage) {
@@ -132,7 +134,7 @@ public class DepartmentListController implements Initializable, DataChangeListen
 	private void initEditButtons() {
 		tableColumnEDIT.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
 		tableColumnEDIT.setCellFactory(param -> new TableCell<Department, Department>() {
-			private final Button button = new Button("edit");
+			private final Button button = new Button("editar");
 
 			@Override
 			protected void updateItem(Department obj, boolean empty) {
@@ -151,7 +153,7 @@ public class DepartmentListController implements Initializable, DataChangeListen
 	private void initRemoveButtons() {
 		tableColumnREMOVE.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
 		tableColumnREMOVE.setCellFactory(param -> new TableCell<Department, Department>() {
-			private final Button button = new Button("remove");
+			private final Button button = new Button("remover");
 
 			@Override
 			protected void updateItem(Department obj, boolean empty) {
@@ -167,18 +169,18 @@ public class DepartmentListController implements Initializable, DataChangeListen
 	}
 
 	private void removeEntity(Department obj) {
-		Optional<ButtonType> result = alertas.showConfirmation("Confirmation", "Are you sure to delete?");
+		Optional<ButtonType> result = alertas.showConfirmation("Confirmação", "Realmente deseja excluir o registro?");
 
 		if (result.get() == ButtonType.OK) {
 			if (service == null) {
-				throw new IllegalStateException("Service was null");
+				throw new IllegalStateException("Service não injetado, esta nulo!!!");
 			}
 			try {
 				service.remove(obj);
 				updateTableView();
 			}
 			catch (DbIntegrityException e) {
-				alertas.showAlert("Error removing object", null, e.getMessage(), AlertType.ERROR);
+				alertas.showAlert("Erro ao remover o registro.", null, e.getMessage(), AlertType.ERROR);
 			}
 		}
 	}

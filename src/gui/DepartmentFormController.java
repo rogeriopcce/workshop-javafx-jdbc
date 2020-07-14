@@ -63,10 +63,10 @@ public class DepartmentFormController implements Initializable{
 	@FXML
 	public void onbtSalvarAction(ActionEvent event) {
 		if (entity == null) {
-			throw new IllegalStateException("Entity was null");
+			throw new IllegalStateException("Entidade vazia.");
 		}
 		if (service == null) {
-			throw new IllegalStateException("Service was null");
+			throw new IllegalStateException("O Serviço é nulo.");
 		}
 		try {
 			entity = getFormData();
@@ -78,7 +78,7 @@ public class DepartmentFormController implements Initializable{
 			setErrorMessages(e.getErrors());
 		}
 		catch (DbException e) {
-			alertas.showAlert("Error saving object", null, e.getMessage(), AlertType.ERROR);
+			alertas.showAlert("Erro: Objeto Vazio...", null, e.getMessage(), AlertType.ERROR);
 		}		
 	}
 	
@@ -119,7 +119,7 @@ public class DepartmentFormController implements Initializable{
 		obj.setId(Utils.tryParseToInt(txtId.getText()));
 		
 		if (txtName.getText() == null || txtName.getText().trim().equals("")) {
-			exception.addError("name", "Field can't be empty");
+			exception.addError("name", "O campo nome está vazio!!!");
 		}
 		obj.setName(txtName.getText());
 		
