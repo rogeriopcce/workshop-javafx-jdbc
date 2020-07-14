@@ -84,10 +84,13 @@ public class DepartmentListController implements Initializable {
 
 	private void createDialogForm(Department obj, String absoluteName, Stage parenteStage) {
 		try {
+
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			Pane pane = loader.load();
 			
 			DepartmentFormController controller = loader.getController();
+			controller.setDepartmentService(new DepartmentService());
+			//controller.subscribeDataChangeListener(this);			
 			controller.setDepartment(obj);
 			controller.updateFormdata();
 
@@ -98,7 +101,9 @@ public class DepartmentListController implements Initializable {
 			dialogStage.initOwner(parenteStage);
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			dialogStage.showAndWait();
+			
 		} catch (IOException e) {
+			e.printStackTrace();
 			alertas.showAlert("Erro IOException", "Erro ao chamar o Departamento", e.getMessage(),
 					Alert.AlertType.ERROR);
 		}
