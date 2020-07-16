@@ -20,7 +20,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -32,6 +31,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.entities.Seller;
+import model.services.DepartmentService;
 import model.services.SellerService;
 
 public class SellerListController implements Initializable, DataChangeListener {
@@ -52,7 +52,7 @@ public class SellerListController implements Initializable, DataChangeListener {
 	
 	@FXML
 	private TableColumn<Seller, Date> tableColumnBirthDate;
-
+	
 	@FXML
 	private TableColumn<Seller, Double> tableColumnBaseSalary;
 	
@@ -60,29 +60,30 @@ public class SellerListController implements Initializable, DataChangeListener {
 	private TableColumn<Seller, Seller> tableColumnEDIT;
 
 	@FXML
-	private TableColumn<Seller, Seller> tableColumnREMOVE;	
-	
+	private TableColumn<Seller, Seller> tableColumnREMOVE;
+
 	@FXML
-	private Button btnNovo;
+	private Button btNew;
 
 	private ObservableList<Seller> obsList;
 
 	@FXML
-	public void btnNovoAction(ActionEvent event) {
+	public void onBtNewAction(ActionEvent event) {
 		Stage parentStage = Utils.currentStage(event);
 		Seller obj = new Seller();
-		
 		createDialogForm(obj, "/gui/SellerForm.fxml", parentStage);
 	}
 
+	public void setSellerService(SellerService service) {
+		this.service = service;
+	}
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
-		InitializeNodes();
+		initializeNodes();
 	}
 
-	private void InitializeNodes() {
-
+	private void initializeNodes() {
 		tableColumnId.setCellValueFactory(new PropertyValueFactory<>("id"));
 		tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
 		tableColumnEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
@@ -95,15 +96,10 @@ public class SellerListController implements Initializable, DataChangeListener {
 		tableViewSeller.prefHeightProperty().bind(stage.heightProperty());
 	}
 
-	public void setSellerService(SellerService service) {
-		this.service = service;
-	}
-
 	public void updateTableView() {
 		if (service == null) {
-			throw new IllegalStateException("Service não foi carregado");
+			throw new IllegalStateException("Service was null");
 		}
-
 		List<Seller> list = service.findAll();
 		obsList = FXCollections.observableArrayList(list);
 		tableViewSeller.setItems(obsList);
@@ -111,38 +107,34 @@ public class SellerListController implements Initializable, DataChangeListener {
 		initRemoveButtons();
 	}
 
-	private void createDialogForm(Seller obj, String absoluteName, Stage parenteStage) {
+	private void createDialogForm(Seller obj, String absoluteName, Stage parentStage) {
 		try {
-
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			Pane pane = loader.load();
-			
+
 			SellerFormController controller = loader.getController();
-			controller.setSellerService(new SellerService());
-			controller.subscribeDataChangeListener(this);			
 			controller.setSeller(obj);
-			controller.updateFormdata();
+			controller.setServices(new SellerService(), new DepartmentService());
+			controller.loadAssociatedObjects();
+			controller.subscribeDataChangeListener(this);
+			controller.updateFormData();
 
 			Stage dialogStage = new Stage();
-			dialogStage.setTitle("Cadastrar Vendedores");
+			dialogStage.setTitle("Enter Seller data");
 			dialogStage.setScene(new Scene(pane));
 			dialogStage.setResizable(false);
-			dialogStage.initOwner(parenteStage);
+			dialogStage.initOwner(parentStage);
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			dialogStage.showAndWait();
-			
 		} catch (IOException e) {
 			e.printStackTrace();
-			alertas.showAlert("Erro IOException", "Erro ao chamar o Departamento", e.getMessage(),
-					Alert.AlertType.ERROR);
+			alertas.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
 		}
 	}
-
 
 	@Override
 	public void onDataChanged() {
 		updateTableView();
-		
 	}
 
 	private void initEditButtons() {
@@ -183,19 +175,19 @@ public class SellerListController implements Initializable, DataChangeListener {
 	}
 
 	private void removeEntity(Seller obj) {
-		Optional<ButtonType> result = alertas.showConfirmation("Confirmação", "Realmente deseja excluir o registro?");
+		Optional<ButtonType> result = alertas.showConfirmation("Confirmation", "Are you sure to delete?");
 
 		if (result.get() == ButtonType.OK) {
 			if (service == null) {
-				throw new IllegalStateException("Service não injetado, esta nulo!!!");
+				throw new IllegalStateException("Service was null");
 			}
 			try {
 				service.remove(obj);
 				updateTableView();
 			}
 			catch (DbIntegrityException e) {
-				alertas.showAlert("Erro ao remover o registro.", null, e.getMessage(), AlertType.ERROR);
+				alertas.showAlert("Error removing object", null, e.getMessage(), AlertType.ERROR);
 			}
 		}
-	}
+	}	
 }
